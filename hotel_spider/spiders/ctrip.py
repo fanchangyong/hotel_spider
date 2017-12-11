@@ -34,18 +34,17 @@ class CtripSpider(scrapy.Spider):
                                         }
                                     })
             request.meta['city'] = response.meta['city']
-            request.meta['raw_name'] = hotel_name
+            request.meta['hotel_name'] = hotel_name
             request.meta['hotel_url'] = hotel_url
             yield request
 
     def parse_hotel_page(self, response):
         rooms = response.css('table#J_RoomListTbl tr[expand]')
-        print('hotel url: ', response.meta['hotel_url'])
         source = 'ctrip'
         country = 'cn'
         meta = response.meta
         city = meta['city']
-        raw_name = meta['raw_name']
+        hotel_name = meta['hotel_name']
         hotel_url = meta['hotel_url']
 
         room_name = None
@@ -61,7 +60,7 @@ class CtripSpider(scrapy.Spider):
             item['source'] = source
             item['country'] = country
             item['city'] = city
-            item['raw_name'] = raw_name
+            item['hotel_name'] = hotel_name
             item['hotel_url'] = hotel_url
             item['room_name'] = room_name
             item['product_name'] = product_name

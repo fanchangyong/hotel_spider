@@ -17,7 +17,7 @@ class ProductItem(scrapy.Item):
     source = scrapy.Field()
     country = scrapy.Field()
     city = scrapy.Field()
-    raw_name = scrapy.Field()
+    hotel_name = scrapy.Field()
     brand = scrapy.Field()
     branch = scrapy.Field()
     hotel_url = scrapy.Field()

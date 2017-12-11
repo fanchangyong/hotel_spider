@@ -31,79 +31,12 @@ class HotelSpiderPipeline(object):
             raise DropItem('Unknown item type: ' % item)
         return item
 
-    def process_hotel_item(self, item, spider):
-        source = item['source']
-        country = item['country']
-        city = item['city']
-        raw_name = item['raw_name']
-        url = item['url']
-        try:
-            self.cursor.execute(
-                """
-                select id from hotels where source=%s and country=%s and city=%s and raw_name=%s
-                """,
-                (source, country, city, raw_name)
-            )
-            ret = self.cursor.fetchone()
-            if ret:
-                hotel_id = ret[0]
-                self.cursor.execute(
-                    """
-                    update hotels set url = %s where id = %s
-                    """,
-                    (url, hotel_id)
-                )
-                self.cursor.commit()
-            else:
-                self.cursor.execute(
-                    """
-                    INSERT INTO hotels(source, country, city, raw_name, url)
-                    VALUES (%s, %s, %s, %s, %s)
-                    """,
-                    (source, country, city, raw_name, url)
-                )
-                self.connect.commit()
-        except Exception as error:
-            logging.info(error)
-
-    def process_room_item(self, item, spider):
-        try:
-            hotel_item = item['hotel_item']
-            source = hotel_item['source']
-            country = hotel_item['country']
-            city = hotel_item['city']
-            hotel_name = hotel_item['raw_name']
-            room_name = item['name']
-
-            self.cursor.execute(
-                """
-                select id from hotels where source=%s and country=%s and city=%s and raw_name=%s
-                """,
-                (source, country, city, hotel_name)
-            )
-            ret = self.cursor.fetchone()
-            if ret:
-                hotel_id = ret[0]
-            else:
-                logging.error('Not found hotel: ', hotel_item)
-        except Exception as error:
-            logging.error(error)
-
-        self.cursor.execute(
-            """
-            INSERT INTO rooms(hotel_name, name)
-            VALUES (%s, %s)
-            """,
-            (item['hotel_item']['raw_name'], item['name'])
-        )
-        self.connect.commit()
-
     def process_product_item(self, item, spider):
         try:
             source = item['source']
             country = item['country']
             city = item['city']
-            raw_name = item['raw_name']
+            raw_name = item['hotel_name']
             hotel_url = item['hotel_url']
             room_name = item['room_name']
             product_name = item['product_name']

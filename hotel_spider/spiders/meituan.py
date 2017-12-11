@@ -45,7 +45,7 @@ class MeituancitiesSpider(scrapy.Spider):
                                 slot_policy=SlotPolicy.SINGLE_SLOT
                                 )
             request.meta['city'] = response.meta['city']
-            request.meta['raw_name'] = hotel.css('a::text').extract_first().strip()
+            request.meta['hotel_name'] = hotel.css('a::text').extract_first().strip()
             request.meta['hotel_url'] = url
             yield request
 
@@ -53,7 +53,7 @@ class MeituancitiesSpider(scrapy.Spider):
         source = 'meituan'
         country = 'cn'
         city = response.meta['city']
-        raw_name = response.meta['raw_name']
+        hotel_name = response.meta['hotel_name']
         hotel_url = response.meta['hotel_url']
 
         for room in response.css('.deal-item'):
@@ -66,7 +66,7 @@ class MeituancitiesSpider(scrapy.Spider):
                 product_item['source'] = source
                 product_item['country'] = country
                 product_item['city'] = city
-                product_item['raw_name'] = raw_name
+                product_item['hotel_name'] = hotel_name
                 product_item['hotel_url'] = hotel_url
                 product_item['room_name'] = room_name
                 product_item['product_name'] = product_name
