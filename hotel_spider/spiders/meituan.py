@@ -15,9 +15,9 @@ class MeituancitiesSpider(scrapy.Spider):
     def parse(self, response):
         for city in response.css('.cities .city')[:1]:
             url = city.css('a::attr(href)').extract_first()
-            city = city.css('::text').extract_first()
+            city_name = city.css('::text').extract_first()
             request = Request(url='http:' + url, callback=self.parse_after_change_city)
-            request.meta['city'] = city
+            request.meta['city'] = city_name
             yield request
 
     def parse_after_change_city(self, response):
@@ -44,23 +44,21 @@ class MeituancitiesSpider(scrapy.Spider):
                                 },
                                 slot_policy=SlotPolicy.SINGLE_SLOT
                                 )
-            request.meta['source'] = 'meituan'
-            request.meta['country'] = 'cn'
             request.meta['city'] = response.meta['city']
             request.meta['raw_name'] = hotel.css('a::text').extract_first().strip()
             request.meta['hotel_url'] = url
             yield request
 
     def parse_hotel_rooms(self, response):
-        source = response.meta['source']
-        country = response.meta['country']
+        source = 'meituan'
+        country = 'cn'
         city = response.meta['city']
         raw_name = response.meta['raw_name']
         hotel_url = response.meta['hotel_url']
 
-        for hotel in response.css('.deal-item'):
-            room_name = hotel.css('.mb15.deal-cellname::text').extract_first().strip()
-            for product in hotel.css('tr.goods'):
+        for room in response.css('.deal-item'):
+            room_name = room.css('.mb15.deal-cellname::text').extract_first().strip()
+            for product in room.css('tr.goods'):
                 product_name = product.css('span.deal-cellname::text').extract_first().strip()
                 product_price = product.css('em.price-number::text').extract_first().strip()
 
