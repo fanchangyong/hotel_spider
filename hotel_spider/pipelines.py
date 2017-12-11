@@ -9,7 +9,7 @@ import logging
 import pymysql
 from scrapy.exceptions import DropItem
 from hotel_spider import settings
-from hotel_spider.items import ProductItem
+from hotel_spider.items import ProductItem, CityItem
 
 
 class HotelSpiderPipeline(object):
@@ -27,6 +27,8 @@ class HotelSpiderPipeline(object):
     def process_item(self, item, spider):
         if item.__class__ == ProductItem:
             self.process_product_item(item, spider)
+        elif item.__class__ == CityItem:
+            self.process_city_item(item, spider)
         else:
             raise DropItem('Unknown item type: ' % item)
         return item
@@ -122,6 +124,32 @@ class HotelSpiderPipeline(object):
                     """,
                     (hotel_id, room_id, product_name, product_price)
                 )
+                self.connect.commit()
+
+        except Exception as error:
+            raise error
+
+    def process_city_item(self, item, spider):
+        try:
+            country = item['country']
+            city = item['city']
+            self.cursor.execute(
+                """
+                select id from cities where country = %s and city = %s
+                """,
+                (country, city)
+            )
+            ret = self.cursor.fetchone()
+            if ret:
+                pass
+            else:
+                self.cursor.execute(
+                    """
+                    insert into cities (country, city) values (%s, %s)
+                    """,
+                    (country, city)
+                )
+                self.connect.commit()
 
         except Exception as error:
             raise error

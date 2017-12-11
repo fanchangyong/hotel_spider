@@ -24,3 +24,8 @@ class ProductItem(scrapy.Item):
     room_name = scrapy.Field()
     product_name = scrapy.Field()
     product_price = scrapy.Field()
+
+class CityItem(scrapy.Item):
+    country = scrapy.Field()
+    city = scrapy.Field()
+

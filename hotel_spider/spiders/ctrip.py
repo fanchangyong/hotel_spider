@@ -12,7 +12,7 @@ class CtripSpider(scrapy.Spider):
     start_urls = ['http://hotels.ctrip.com/domestic-city-hotel.html']
 
     def parse(self, response):
-        for city in response.css('.pinyin_filter_detail dd a')[:1]:
+        for city in response.css('.pinyin_filter_detail dd a'):
             city_name = city.css('a::text').extract_first()
             url = city.css('a::attr(href)').extract_first()
             request = Request(url='http://hotels.ctrip.com' + url, callback=self.parse_city_hotels)
@@ -20,7 +20,7 @@ class CtripSpider(scrapy.Spider):
             yield request
 
     def parse_city_hotels(self, response):
-        for hotel in response.css('.hotel_item')[:1]:
+        for hotel in response.css('.hotel_item'):
             hotel_name = hotel.css('.hotel_name a::text').extract_first()
             hotel_url = hotel.css('.hotel_name a::attr(href)').extract_first()
             hotel_url = 'http://hotels.ctrip.com' + hotel_url
