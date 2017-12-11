@@ -23,6 +23,7 @@ class CtripIntlSpider(scrapy.Spider):
     def parse_country_page(self, response):
         for city in response.css('ul.other_city li a'):
             city_name = city.css('::text').extract_first()
+            city_name = city_name.replace('酒店', '')
             city_url = city.css('::attr(href)').extract_first()
             city_url = 'http://hotels.ctrip.com' + city_url
             request = Request(url=city_url, callback=self.parse_hotel_list_page)
