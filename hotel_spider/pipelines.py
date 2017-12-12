@@ -10,6 +10,7 @@ import pymysql
 from scrapy.exceptions import DropItem
 from hotel_spider import settings
 from hotel_spider.items import ProductItem, CityItem
+from hotel_spider.utils import get_district_from_addr
 
 
 class HotelSpiderPipeline(object):
@@ -38,6 +39,7 @@ class HotelSpiderPipeline(object):
             source = item['source']
             country = item['country']
             city = item['city']
+            address = item['address']
             raw_name = item['hotel_name']
             hotel_url = item['hotel_url']
             room_name = item['room_name']
@@ -59,6 +61,10 @@ class HotelSpiderPipeline(object):
             if not product_price:
                 raise DropItem('no product_price')
 
+            district = None
+            if address:
+                district = get_district_from_addr(address)
+
             # Insert or update hotels
             self.cursor.execute(
                 """
@@ -71,18 +77,18 @@ class HotelSpiderPipeline(object):
                 hotel_id = ret[0]
                 self.cursor.execute(
                     """
-                    update hotels set url = %s where id = %s
+                    update hotels set url = %s, address = %s, district = %s where id = %s
                     """,
-                    (hotel_url, hotel_id)
+                    (hotel_url, address, district, hotel_id)
                 )
                 self.connect.commit()
             else:
                 self.cursor.execute(
                     """
-                    INSERT INTO hotels(source, country, city, raw_name, url)
-                    VALUES (%s, %s, %s, %s, %s)
+                    INSERT INTO hotels(source, country, city, address, district, raw_name, url)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
                     """,
-                    (source, country, city, raw_name, hotel_url)
+                    (source, country, city, address, district, raw_name, hotel_url)
                 )
                 ret = self.connect.commit()
                 hotel_id = self.cursor.lastrowid

@@ -6,12 +6,14 @@ USE hotel_spider;
 CREATE TABLE hotels (
   id INT(10) AUTO_INCREMENT PRIMARY KEY,
   source VARCHAR(255) NOT NULL COMMENT '数据来源: meituan, ctrip, expedia',
-  country VARCHAR(255) NOT NULL COMMENT '国家',
-  city VARCHAR(255) NOT NULL COMMENT '酒店所在城市',
+  country VARCHAR(255) COMMENT '国家',
+  city VARCHAR(255) COMMENT '酒店所在城市',
+  district VARCHAR(255) COMMENT '酒店所在区县',
+  address VARCHAR(255) COMMENT '酒店所在详细地址',
   raw_name VARCHAR(255) NOT NULL COMMENT '酒店原始名称(平台显示名称)',
-  brand VARCHAR(255) NOT NULL COMMENT '酒店品牌',
-  branch VARCHAR(255) NOT NULL COMMENT '分店名称/地址',
-  url VARCHAR(255) NOT NULL COMMENT '酒店url',
+  brand VARCHAR(255) COMMENT '酒店品牌',
+  branch VARCHAR(255) COMMENT '分店名称/地址',
+  url VARCHAR(255) COMMENT '酒店url',
   created_at datetime DEFAULT CURRENT_TIMESTAMP,
   updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) COMMENT='酒店数据';

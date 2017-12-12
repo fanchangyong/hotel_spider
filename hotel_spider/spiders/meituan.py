@@ -27,14 +27,14 @@ class MeituancitiesSpider(scrapy.Spider):
         yield request
 
     def parse_city_redirect(self, response):
-        request = Request(url=response.url, callback=self.parse_city_page)
+        request = Request(url=response.url, callback=self.parse_hotel_list_page)
         request.meta['city'] = response.meta['city']
         yield request
 
-    def parse_city_page(self, response):
-        for hotel in response.css('.poi-title')[:10]:
-            url = hotel.css('a::attr(href)').extract_first()
-            request = SplashRequest(url=url, callback=self.parse_hotel_rooms,
+    def parse_hotel_list_page(self, response):
+        for hotel in response.css('article.poi-item')[:10]:
+            hotel_url = hotel.css('a.poi-title::attr(href)').extract_first()
+            request = SplashRequest(url=hotel_url, callback=self.parse_hotel_rooms,
                                 args={
                                     'wait': 3,
                                     'timeout': 20,
@@ -45,14 +45,16 @@ class MeituancitiesSpider(scrapy.Spider):
                                 slot_policy=SlotPolicy.SINGLE_SLOT
                                 )
             request.meta['city'] = response.meta['city']
-            request.meta['hotel_name'] = hotel.css('a::text').extract_first().strip()
-            request.meta['hotel_url'] = url
+            request.meta['hotel_name'] = hotel.css('a.poi-title::text').extract_first().strip()
+            request.meta['address'] = hotel.css('div.poi-address::text').extract_first().strip()
+            request.meta['hotel_url'] = hotel_url
             yield request
 
     def parse_hotel_rooms(self, response):
         source = 'meituan'
         country = 'cn'
         city = response.meta['city']
+        address = response.meta['address']
         hotel_name = response.meta['hotel_name']
         hotel_url = response.meta['hotel_url']
 
@@ -66,6 +68,7 @@ class MeituancitiesSpider(scrapy.Spider):
                 product_item['source'] = source
                 product_item['country'] = country
                 product_item['city'] = city
+                product_item['address'] = address
                 product_item['hotel_name'] = hotel_name
                 product_item['hotel_url'] = hotel_url
                 product_item['room_name'] = room_name
