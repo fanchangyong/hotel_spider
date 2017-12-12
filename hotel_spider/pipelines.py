@@ -40,6 +40,8 @@ class HotelSpiderPipeline(object):
             country = item['country']
             city = item['city']
             address = item['address']
+            latitude = item['latitude']
+            longitude = item['longitude']
             raw_name = item['hotel_name']
             hotel_url = item['hotel_url']
             room_name = item['room_name']
@@ -85,10 +87,10 @@ class HotelSpiderPipeline(object):
             else:
                 self.cursor.execute(
                     """
-                    INSERT INTO hotels(source, country, city, address, district, raw_name, url)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO hotels(source, country, city, address, latitude, longitude, district, raw_name, url)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """,
-                    (source, country, city, address, district, raw_name, hotel_url)
+                    (source, country, city, address, latitude, longitude, district, raw_name, hotel_url)
                 )
                 ret = self.connect.commit()
                 hotel_id = self.cursor.lastrowid

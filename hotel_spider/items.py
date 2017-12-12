@@ -18,6 +18,8 @@ class ProductItem(scrapy.Item):
     country = scrapy.Field()
     city = scrapy.Field()
     address = scrapy.Field()
+    latitude = scrapy.Field()
+    longitude = scrapy.Field()
     hotel_name = scrapy.Field()
     brand = scrapy.Field()
     branch = scrapy.Field()

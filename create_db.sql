@@ -10,6 +10,8 @@ CREATE TABLE hotels (
   city VARCHAR(255) COMMENT '酒店所在城市',
   district VARCHAR(255) COMMENT '酒店所在区县',
   address VARCHAR(255) COMMENT '酒店所在详细地址',
+  latitude VARCHAR(255) COMMENt '纬度',
+  longitude VARCHAR(255) COMMENT '经度',
   raw_name VARCHAR(255) NOT NULL COMMENT '酒店原始名称(平台显示名称)',
   brand VARCHAR(255) COMMENT '酒店品牌',
   branch VARCHAR(255) COMMENT '分店名称/地址',

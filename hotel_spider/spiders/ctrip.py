@@ -24,6 +24,7 @@ class CtripSpider(scrapy.Spider):
             hotel_name = hotel.css('.hotel_name a::text').extract_first()
             hotel_url = hotel.css('.hotel_name a::attr(href)').extract_first()
             hotel_url = 'http://hotels.ctrip.com' + hotel_url
+            address = hotel.css('.hotel_item_htladdress::text').extract_first()
             request = Request(url=hotel_url, callback=self.parse_hotel_page)
             request = SplashRequest(url=hotel_url, callback=self.parse_hotel_page,
                                     args={
@@ -34,19 +35,24 @@ class CtripSpider(scrapy.Spider):
                                         }
                                     })
             request.meta['city'] = response.meta['city']
+            request.meta['address'] = address
             request.meta['hotel_name'] = hotel_name
             request.meta['hotel_url'] = hotel_url
             yield request
 
     def parse_hotel_page(self, response):
-        rooms = response.css('table#J_RoomListTbl tr[expand]')
         source = 'ctrip'
         country = 'cn'
         meta = response.meta
         city = meta['city']
+        address = meta['address']
         hotel_name = meta['hotel_name']
         hotel_url = meta['hotel_url']
 
+        latitude = response.css('meta[itemprop="latitude"]::attr(content)').extract_first()
+        longitude = response.css('meta[itemprop="longitude"]::attr(content)').extract_first()
+
+        rooms = response.css('table#J_RoomListTbl tr[expand]')
         room_name = None
         for room in rooms:
             _room_name = room.css('a.room_unfold::text').extract_first()
@@ -60,6 +66,9 @@ class CtripSpider(scrapy.Spider):
             item['source'] = source
             item['country'] = country
             item['city'] = city
+            item['address'] = address
+            item['latitude'] = latitude
+            item['longitude'] = longitude
             item['hotel_name'] = hotel_name
             item['hotel_url'] = hotel_url
             item['room_name'] = room_name
