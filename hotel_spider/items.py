@@ -17,6 +17,7 @@ class ProductItem(scrapy.Item):
     source = scrapy.Field()
     country = scrapy.Field()
     city = scrapy.Field()
+    district = scrapy.Field()
     address = scrapy.Field()
     latitude = scrapy.Field()
     longitude = scrapy.Field()

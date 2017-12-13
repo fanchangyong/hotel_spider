@@ -39,9 +39,10 @@ class HotelSpiderPipeline(object):
             source = item['source']
             country = item['country']
             city = item['city']
-            address = item['address']
-            latitude = item['latitude']
-            longitude = item['longitude']
+            district = item.get('district')
+            address = item.get('address')
+            latitude = item.get('latitude')
+            longitude = item.get('longitude')
             raw_name = item['hotel_name']
             hotel_url = item['hotel_url']
             room_name = item['room_name']
@@ -63,8 +64,7 @@ class HotelSpiderPipeline(object):
             if not product_price:
                 raise DropItem('no product_price')
 
-            district = None
-            if address:
+            if not district and address:
                 district = get_district_from_addr(address)
 
             # Insert or update hotels

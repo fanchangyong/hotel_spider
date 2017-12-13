@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import pymysql
+import json
 
 from scrapy.http import Request
 from scrapy_splash import SplashRequest
@@ -13,6 +14,24 @@ class ExpediaSpider(scrapy.Spider):
     allowed_domains = ['expedia.cn', 'travelads.hlserve.com']
 
     def start_requests(self):
+        ### 中国的地址从json读取
+        locations = json.load(open('locations.json'))
+        country_name = '中国'
+        for i in range(len(locations)):
+            province = locations[i]
+            print('province: ', province)
+            province_name = province['name']
+            cities = province['child']
+            for j in range(len(cities)):
+                city = cities[j]
+                city_name = city['name']
+                districts = city['child']
+                for k in range(len(districts)):
+                    district = districts[k]
+                    district_name = district['name']
+                    yield self.request_with_location(country_name, province_name, city_name, district_name)
+
+        ### 国外的地址从mysql读取
         connect = pymysql.connect(
             host=settings.MYSQL_HOST,
             db=settings.MYSQL_DB,
@@ -24,21 +43,27 @@ class ExpediaSpider(scrapy.Spider):
         cursor = connect.cursor()
         cursor.execute('select country, city from cities')
         ret = cursor.fetchall()
-        for r in ret[:3]:
+        for r in ret:
             country_name = r[0]
             city_name = r[1]
-            url = 'https://www.expedia.cn/Hotel-Search?destination=' + city_name
-            request = SplashRequest(url=url, callback=self.parse,
-                                    args={
-                                        'wait': 5,
-                                        'timeout': 20,
-                                        'headers': {
-                                            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'
-                                        }
-                                    })
-            request.meta['city'] = city_name
-            request.meta['country'] = country_name
+            request = self.request_with_location(country_name, '', city_name, '')
             yield request
+
+    def request_with_location(self, country, province, city, district):
+        url = 'https://www.expedia.cn/Hotel-Search?destination=' + country + province + city + district
+        request = SplashRequest(url=url, callback=self.parse,
+                                args={
+                                    'wait': 5,
+                                    'timeout': 20,
+                                    'headers': {
+                                        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'
+                                    }
+                                })
+        request.meta['country'] = country
+        request.meta['city'] = city
+        request.meta['district'] = district
+        return request
+
 
     def parse(self, response):
         for hotel in response.css('article.hotel.listing'):
@@ -55,6 +80,7 @@ class ExpediaSpider(scrapy.Spider):
             meta = request.meta
             meta['country'] = response.meta['country']
             meta['city'] = response.meta['city']
+            meta['district'] = response.meta['district']
             meta['hotel_name'] = hotel_name
             meta['hotel_url'] = hotel_url
             yield request
@@ -64,6 +90,7 @@ class ExpediaSpider(scrapy.Spider):
         source = 'expedia'
         country = meta['country']
         city = meta['city']
+        district = meta['district']
         hotel_name = meta['hotel_name']
         hotel_url = meta['hotel_url']
 
@@ -79,6 +106,7 @@ class ExpediaSpider(scrapy.Spider):
                 item['source'] = source
                 item['country'] = country
                 item['city'] = city
+                item['district'] = district
                 item['hotel_name'] = hotel_name
                 item['hotel_url'] = hotel_url
                 item['room_name'] = room_name
