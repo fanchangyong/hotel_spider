@@ -19,7 +19,6 @@ class ExpediaSpider(scrapy.Spider):
         country_name = '中国'
         for i in range(len(locations)):
             province = locations[i]
-            print('province: ', province)
             province_name = province['name']
             cities = province['child']
             for j in range(len(cities)):
