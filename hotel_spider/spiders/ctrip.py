@@ -11,7 +11,7 @@ class CtripSpider(scrapy.Spider):
     start_urls = ['http://hotels.ctrip.com/domestic-city-hotel.html']
 
     def parse(self, response):
-        for city in response.css('.pinyin_filter_detail dd a')[:1]:
+        for city in response.css('.pinyin_filter_detail dd a')[:10]:
             city_name = city.css('a::text').extract_first()
             city_url = city.css('a::attr(href)').extract_first()
 
@@ -58,7 +58,7 @@ class CtripSpider(scrapy.Spider):
     def parse_after_max_page(self, response):
         max_page = response.data['max_page']
         base_url = response.url
-        for page in range(1, max_page + 1):
+        for page in range(1, max_page + 1)[:1]:
             script = """
             function wait_for_element(splash, ele_selector)
                 while true do
@@ -90,7 +90,7 @@ class CtripSpider(scrapy.Spider):
             yield request
 
     def parse_hotel_list_page(self, response):
-        for hotel in response.css('.hotel_item'):
+        for hotel in response.css('.hotel_item')[:1]:
             hotel_name = hotel.css('.hotel_name a::text').extract_first()
             hotel_url = hotel.css('.hotel_name a::attr(href)').extract_first()
             hotel_url = 'http://hotels.ctrip.com' + hotel_url
@@ -144,7 +144,7 @@ class CtripSpider(scrapy.Spider):
 
         rooms = response.css('table#J_RoomListTbl tr[expand]')
         room_name = None
-        for room in rooms:
+        for room in rooms[:1]:
             _room_name = room.css('a.room_unfold::text').extract_first()
             if _room_name:
                 room_name = _room_name.strip()

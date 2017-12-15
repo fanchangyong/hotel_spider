@@ -11,6 +11,7 @@ from scrapy.exceptions import DropItem
 from hotel_spider import settings
 from hotel_spider.items import ProductItem, CityItem
 from hotel_spider.utils import get_district_from_addr
+from hotel_spider.geocode import latlon_to_addr
 
 
 class HotelSpiderPipeline(object):
@@ -66,6 +67,10 @@ class HotelSpiderPipeline(object):
 
             if not district and address:
                 district = get_district_from_addr(address)
+
+            if latitude and longitude:
+                addr = latlon_to_addr(latitude, longitude)
+                district = addr['district']
 
             # Insert or update hotels
             self.cursor.execute(

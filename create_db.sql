@@ -15,7 +15,7 @@ CREATE TABLE hotels (
   raw_name VARCHAR(255) NOT NULL COMMENT '酒店原始名称(平台显示名称)',
   brand VARCHAR(255) COMMENT '酒店品牌',
   branch VARCHAR(255) COMMENT '分店名称/地址',
-  url VARCHAR(255) COMMENT '酒店url',
+  url TEXT(2048) COMMENT '酒店url',
   created_at datetime DEFAULT CURRENT_TIMESTAMP,
   updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) COMMENT='酒店数据';

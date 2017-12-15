@@ -2,6 +2,8 @@
 import scrapy
 import pymysql
 import json
+import re
+import math
 
 from scrapy.http import Request
 from scrapy_splash import SplashRequest
@@ -11,24 +13,25 @@ from hotel_spider.items import ProductItem
 
 class ExpediaSpider(scrapy.Spider):
     name = 'expedia'
-    allowed_domains = ['expedia.cn', 'travelads.hlserve.com']
 
     def start_requests(self):
         ### 中国的地址从json读取
         locations = json.load(open('locations.json'))
         country_name = '中国'
-        for i in range(len(locations)):
+        for i in range(len(locations))[:1]:
             province = locations[i]
             province_name = province['name']
             cities = province['child']
-            for j in range(len(cities)):
+            for j in range(len(cities))[:1]:
                 city = cities[j]
                 city_name = city['name']
                 districts = city['child']
-                for k in range(len(districts)):
+                for k in range(len(districts))[:1]:
                     district = districts[k]
                     district_name = district['name']
-                    yield self.request_with_location(country_name, province_name, city_name, district_name)
+
+                    request = self.request_pages_of_location(country_name, province_name, city_name, district_name)
+                    yield request
 
         ### 国外的地址从mysql读取
         connect = pymysql.connect(
@@ -45,33 +48,113 @@ class ExpediaSpider(scrapy.Spider):
         for r in ret:
             country_name = r[0]
             city_name = r[1]
-            request = self.request_with_location(country_name, '', city_name, '')
+
+            request = self.request_pages_of_location(country_name, '', city_name, '')
             yield request
 
-    def request_with_location(self, country, province, city, district):
-        url = 'https://www.expedia.cn/Hotel-Search?destination=' + country + province + city + district
-        request = SplashRequest(url=url, callback=self.parse,
+    def request_pages_of_location(self, country_name, province_name, city_name, district_name):
+        url = 'https://www.expedia.cn/Hotel-Search?destination=' + country_name + province_name + city_name + district_name
+        script = """
+        function wait_for_element(splash, ele_selector)
+            while true do
+                local ele = splash:select(ele_selector)
+                if ele then
+                    break
+                end
+                splash:wait(0.05)
+            end
+        end
+
+        function main(splash, args)
+            local url = args.url
+            splash:go(url)
+            wait_for_element(splash, '.showing-results')
+            return splash:html()
+        end
+        """
+        request = SplashRequest(callback=self.parse_max_page, endpoint='/execute',
                                 args={
-                                    'wait': 5,
-                                    'timeout': 20,
+                                    'lua_source': script,
+                                    'url': url,
+                                    'images': 0,
                                     'headers': {
                                         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'
                                     }
                                 })
-        request.meta['country'] = country
-        request.meta['city'] = city
-        request.meta['district'] = district
+        request.meta['country'] = country_name
+        request.meta['city'] = city_name
+        request.meta['district'] = district_name
         return request
 
+    def parse_max_page(self, response):
+        result_str = response.css('.showing-results::text').extract_first()
+        pattern = re.compile(r'共(.*)个')
+        m = re.search(pattern, result_str)
+        total = int(m.group(1).strip())
+        pages = math.ceil(total / 20)
+        for page in range(1, pages + 1):
+            script = """
+            function wait_for_element(splash, ele_selector)
+                while true do
+                    local ele = splash:select(ele_selector)
+                    if ele then
+                        break
+                    end
+                    splash:wait(0.05)
+                end
+            end
 
-    def parse(self, response):
+            function main(splash, args)
+                local url = args.url
+                splash:go(url)
+
+                wait_for_element(splash, 'article.hotel.listing')
+                return splash:html()
+            end
+            """
+            paged_url = response.url + '&page=' + str(page)
+            request = SplashRequest(endpoint='/execute', callback=self.parse_hotel_list_page,
+                                    args={
+                                        'url': paged_url,
+                                        'lua_source': script,
+                                        'images': 0,
+                                        'headers': {
+                                            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'
+                                        }
+                                    })
+            request.meta['country'] = response.meta['country']
+            request.meta['city'] = response.meta['city']
+            request.meta['district'] = response.meta['district']
+            yield request
+
+    def parse_hotel_list_page(self, response):
         for hotel in response.css('article.hotel.listing'):
             hotel_name = hotel.css('.hotelName::text').extract_first()
             hotel_url = hotel.css('a.flex-link::attr(href)').extract_first()
+            script = """
+            function wait_for_element(splash, ele_selector)
+                while true do
+                    local ele = splash:select(ele_selector)
+                    if ele then
+                        break
+                    end
+                    splash:wait(0.05)
+                end
+            end
+
+            function main(splash, args)
+                local url = args.url
+                splash:go(url)
+
+                -- wait_for_element(splash, 'tbody.room')
+                return splash:html()
+            end
+
+            """
+
             request = SplashRequest(url=hotel_url, callback=self.parse_hotel_detail_page,
                                     args={
-                                        'wait': 5,
-                                        'timeout': 20,
+                                        'images': 0,
                                         'headers': {
                                             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'
                                         }
