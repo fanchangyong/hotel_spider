@@ -8,28 +8,118 @@ from hotel_spider.items import ProductItem
 
 class CtripSpider(scrapy.Spider):
     name = 'ctrip'
-    allowed_domains = ['ctrip.com']
     start_urls = ['http://hotels.ctrip.com/domestic-city-hotel.html']
 
     def parse(self, response):
-        for city in response.css('.pinyin_filter_detail dd a'):
+        for city in response.css('.pinyin_filter_detail dd a')[:1]:
             city_name = city.css('a::text').extract_first()
-            url = city.css('a::attr(href)').extract_first()
-            request = Request(url='http://hotels.ctrip.com' + url, callback=self.parse_city_hotels)
+            city_url = city.css('a::attr(href)').extract_first()
+
+            # Get max_page number
+            script = """
+            function wait_for_element(splash, ele_selector)
+                while true do
+                    local ele = splash:select(ele_selector)
+                    if ele then
+                        break
+                    end
+                    splash:wait(0.05)
+                end
+            end
+            function main(splash, args)
+                local url = args.url
+                assert(splash:go(url))
+                splash:wait(5)
+                wait_for_element(splash, 'div.c_page_list')
+                local page_links = splash:select_all('.c_page_list a')
+                local max_page = 0
+                for _, page_link in ipairs(page_links) do
+                    local page = tonumber(page_link:text())
+                    if page > max_page then
+                        max_page = page
+                    end
+                end
+                return { max_page=max_page }
+            end
+            """
+            url = 'http://hotels.ctrip.com' + city_url
+            request = SplashRequest(callback=self.parse_after_max_page, endpoint='/execute',
+                                    args={
+                                        'lua_source': script,
+                                        'url': url,
+                                        'images': 0,
+                                        'headers': {
+                                            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'
+                                        }
+                                    })
             request.meta['city'] = city_name
             yield request
 
-    def parse_city_hotels(self, response):
+    def parse_after_max_page(self, response):
+        max_page = response.data['max_page']
+        base_url = response.url
+        for page in range(1, max_page + 1):
+            script = """
+            function wait_for_element(splash, ele_selector)
+                while true do
+                    local ele = splash:select(ele_selector)
+                    if ele then
+                        break
+                    end
+                    splash:wait(0.05)
+                end
+            end
+            function main(splash, args)
+                local url = args.url
+                assert(splash:go(url))
+                wait_for_element(splash, '.hotel_item')
+                return splash:html()
+            end
+            """
+            paged_url = base_url + '/p' + str(page)
+            request = SplashRequest(endpoint='/execute', callback=self.parse_hotel_list_page,
+                                    args={
+                                        'url': paged_url,
+                                        'lua_source': script,
+                                        'images': 0,
+                                        'headers': {
+                                            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'
+                                        }
+                                    })
+            request.meta['city'] = response.meta['city']
+            yield request
+
+    def parse_hotel_list_page(self, response):
         for hotel in response.css('.hotel_item'):
             hotel_name = hotel.css('.hotel_name a::text').extract_first()
             hotel_url = hotel.css('.hotel_name a::attr(href)').extract_first()
             hotel_url = 'http://hotels.ctrip.com' + hotel_url
             address = hotel.css('.hotel_item_htladdress::text').extract_first()
-            request = Request(url=hotel_url, callback=self.parse_hotel_page)
-            request = SplashRequest(url=hotel_url, callback=self.parse_hotel_page,
+
+            script = """
+            function wait_for_element(splash, ele_selector)
+                while true do
+                    local ele = splash:select(ele_selector)
+                    if ele then
+                        break
+                    end
+                    splash:wait(0.05)
+                end
+            end
+            function main(splash, args)
+                local url = args.url
+                assert(splash:go(url))
+                wait_for_element(splash, 'table#J_RoomListTbl tr[expand]')
+                return splash:html()
+            end
+            """
+
+            request = SplashRequest(endpoint='/execute', callback=self.parse_hotel_page,
                                     args={
-                                        'wait': 5,
+                                        'url': hotel_url,
+                                        'lua_source': script,
                                         'timeout': 20,
+                                        'images': 0,
                                         'headers': {
                                             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'
                                         }

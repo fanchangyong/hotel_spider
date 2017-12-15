@@ -3,7 +3,6 @@ import scrapy
 
 from scrapy.http import Request
 from scrapy_splash import SplashRequest
-from scrapy_splash import SlotPolicy
 
 from hotel_spider.items import ProductItem
 from hotel_spider.utils import cookie_to_dict
