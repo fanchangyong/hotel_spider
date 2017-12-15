@@ -58,6 +58,7 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy_splash.SplashCookiesMiddleware': 723,
     'scrapy_splash.SplashMiddleware': 725,
     'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
+    'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': 811,
 }
 
 # Enable or disable extensions
@@ -105,3 +106,6 @@ DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
 
 FEED_EXPORT_ENCODING = 'utf-8'
+
+# redirect settings
+REDIRECT_ENABLED = True
