@@ -12,7 +12,7 @@ class MeituancitiesSpider(scrapy.Spider):
     start_urls = ['http://www.meituan.com/changecity/']
 
     def parse(self, response):
-        for city in response.css('.cities .city')[:1]:
+        for city in response.css('.cities .city'):
             url = city.css('a::attr(href)').extract_first()
             city_name = city.css('::text').extract_first()
             request = Request(url='http:' + url, callback=self.parse_after_change_city)

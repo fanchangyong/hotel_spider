@@ -18,7 +18,7 @@ CREATE TABLE hotels (
   url TEXT(2048) COMMENT '酒店url',
   created_at datetime DEFAULT CURRENT_TIMESTAMP,
   updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) COMMENT='酒店数据';
+) CHARSET=utf8 COMMENT='酒店数据';
 
 CREATE TABLE rooms (
   id INT(10) AUTO_INCREMENT PRIMARY KEY,
@@ -27,7 +27,7 @@ CREATE TABLE rooms (
   created_at datetime DEFAULT CURRENT_TIMESTAMP,
   updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   -- FOREIGN KEY (hotel_id) REFERENCES hotels(id)
-) COMMENT='酒店房间数据';
+) CHARSET=utf8 COMMENT='酒店房间数据';
 
 CREATE TABLE products (
   id INT(10) AUTO_INCREMENT PRIMARY KEY,
@@ -38,10 +38,10 @@ CREATE TABLE products (
   created_at datetime DEFAULT CURRENT_TIMESTAMP,
   updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   -- FOREIGN KEY (room_id) REFERENCES rooms (id)
-) COMMENT='每个房间下面的产品数据';
+) CHARSET=utf8 COMMENT='每个房间下面的产品数据';
 
 CREATE TABLE cities (
   id INT(10) AUTO_INCREMENT PRIMARY KEY,
   country VARCHAR(255) NOT NULL COMMENT '国家',
   city VARCHAR(255) NOT NULL COMMENT '城市'
-) COMMENT='这个表是给expedia.cn网站的爬虫用的.由于这个网站没有统一的城市入口，通过这个表的数据作为爬虫的入口';
+) CHARSET=utf8 COMMENT='这个表是给expedia.cn网站的爬虫用的.由于这个网站没有统一的城市入口，通过这个表的数据作为爬虫的入口';
