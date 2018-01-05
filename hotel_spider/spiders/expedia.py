@@ -18,15 +18,15 @@ class ExpediaSpider(scrapy.Spider):
         ### 中国的地址从json读取
         locations = json.load(open('locations.json'))
         country_name = '中国'
-        for i in range(len(locations))[:1]:
+        for i in range(len(locations)):
             province = locations[i]
             province_name = province['name']
             cities = province['child']
-            for j in range(len(cities))[:1]:
+            for j in range(len(cities)):
                 city = cities[j]
                 city_name = city['name']
                 districts = city['child']
-                for k in range(len(districts))[:1]:
+                for k in range(len(districts)):
                     district = districts[k]
                     district_name = district['name']
 
