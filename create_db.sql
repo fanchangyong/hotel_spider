@@ -45,3 +45,10 @@ CREATE TABLE cities (
   country VARCHAR(255) NOT NULL COMMENT '国家',
   city VARCHAR(255) NOT NULL COMMENT '城市'
 ) CHARSET=utf8 COMMENT='这个表是给expedia.cn网站的爬虫用的.由于这个网站没有统一的城市入口，通过这个表的数据作为爬虫的入口';
+
+CREATE TABLE geocode (
+  id INT(10) AUTO_INCREMENT PRIMARY KEY,
+  lat VARCHAR(255) NOT NULL,
+  lon VARCHAR(255) NOT NULL,
+  district VARCHAR(255) NOT NULL
+) CHARSET=utf8 COMMENT='geocode cache';
