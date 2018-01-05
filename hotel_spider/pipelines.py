@@ -50,20 +50,20 @@ class HotelSpiderPipeline(object):
             product_name = item['product_name']
             product_price = item['product_price']
 
-            if not source:
-                raise DropItem('no source')
-            if not country:
-                raise DropItem('no country')
-            if not city:
-                raise DropItem('no city')
-            if not raw_name:
-                raise DropItem('no raw_name')
-            if not room_name:
-                raise DropItem('no room_name')
-            if not product_name:
-                raise DropItem('no product_name')
-            if not product_price:
-                raise DropItem('no product_price')
+            # if not source:
+            #     raise DropItem('no source')
+            # if not country:
+            #     raise DropItem('no country')
+            # if not city:
+            #     raise DropItem('no city')
+            # if not raw_name:
+            #     raise DropItem('no raw_name')
+            # if not room_name:
+            #     raise DropItem('no room_name')
+            # if not product_name:
+            #     raise DropItem('no product_name')
+            # if not product_price:
+            #     raise DropItem('no product_price')
 
             if not district and address:
                 district = get_district_from_addr(address)

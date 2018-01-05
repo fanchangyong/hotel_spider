@@ -2,11 +2,14 @@
 import random
 import requests
 import pymysql
+from hotel_spider import settings
 
 API_KEYS = [
     'H34BZ-3VEWX-ISD4E-7ZJK4-SZQT2-O6FQR',
     'CXFBZ-MSOLF-FYNJO-N7547-KKEQ2-VHFJ5',
-    'HNPBZ-NXHEO-MTYWP-SCPCY-2TVBE-YFFDN'
+    'HNPBZ-NXHEO-MTYWP-SCPCY-2TVBE-YFFDN',
+    '5HTBZ-FQCEX-OCC4M-7CEUS-5MB72-FCB2F',
+    'NRXBZ-HUZYU-GRZVJ-4SNCN-5LMUK-WDFVN'
 ]
 
 def latlon_to_addr(latitude, longitude):
@@ -33,14 +36,16 @@ def latlon_to_addr(latitude, longitude):
         body = r.json()
         status = body['status']
         if status != 0:
-            raise '请求腾讯API失败: ' + body['message']
+            print('请求腾讯API失败: ' + body['message'])
+            raise
 
         result = body['result']
         component = result['address_component']
         district = component['district']
         cursor.execute('insert into geocode(lat, lon, district) values(%s, %s, %s)',
-                       lat, lon, district)
+                       (latitude, longitude, district))
+        connect.commit()
 
     return {
-        'district': component['district']
+        'district': district
     }
