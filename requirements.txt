@@ -2,3 +2,4 @@ scrapy_splash
 pymysql
 requests
 scrapy_proxies
+scrapy-fake-useragent
