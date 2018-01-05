@@ -150,7 +150,7 @@ class CtripSpider(scrapy.Spider):
                 room_name = _room_name.strip()
 
             product_name = room.css('.room_type_name::text').extract_first()
-            product_price = room.css('.base_txtdiv::text').extract_first()
+            product_price = room.css('.base_price::text').extract_first()
 
             item = ProductItem()
             item['source'] = source
