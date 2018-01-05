@@ -59,6 +59,9 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy_splash.SplashMiddleware': 725,
     'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
     'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': 811,
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
+    'scrapy_proxies.RandomProxy': 100,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
 }
 
 # Enable or disable extensions
@@ -109,3 +112,10 @@ FEED_EXPORT_ENCODING = 'utf-8'
 
 # redirect settings
 REDIRECT_ENABLED = True
+
+# scrapy-proxies
+RETRY_TIMES = 10
+RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
+
+PROXY_LIST = 'proxy_list.txt'
+PROXY_MODE = 0
