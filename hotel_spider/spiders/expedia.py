@@ -61,7 +61,7 @@ class ExpediaSpider(scrapy.Spider):
                 if ele then
                     break
                 end
-                splash:wait(0.05)
+                splash:wait(1)
             end
         end
 
@@ -100,7 +100,7 @@ class ExpediaSpider(scrapy.Spider):
                     if ele then
                         break
                     end
-                    splash:wait(0.05)
+                    splash:wait(1)
                 end
             end
 
@@ -138,7 +138,7 @@ class ExpediaSpider(scrapy.Spider):
                     if ele then
                         break
                     end
-                    splash:wait(0.05)
+                    splash:wait(1)
                 end
             end
 

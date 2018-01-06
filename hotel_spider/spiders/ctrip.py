@@ -23,7 +23,7 @@ class CtripSpider(scrapy.Spider):
                     if ele then
                         break
                     end
-                    splash:wait(0.05)
+                    splash:wait(0.5)
                 end
             end
             function main(splash, args)
@@ -66,7 +66,7 @@ class CtripSpider(scrapy.Spider):
                     if ele then
                         break
                     end
-                    splash:wait(0.05)
+                    splash:wait(0.5)
                 end
             end
             function main(splash, args)
@@ -103,7 +103,7 @@ class CtripSpider(scrapy.Spider):
                     if ele then
                         break
                     end
-                    splash:wait(0.05)
+                    splash:wait(0.5)
                 end
             end
             function main(splash, args)

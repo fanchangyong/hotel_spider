@@ -33,7 +33,7 @@ class MeituancitiesSpider(scrapy.Spider):
                 if ele then
                     break
                 end
-                splash:wait(0.05)
+                splash:wait(0.5)
             end
         end
 
@@ -80,7 +80,7 @@ class MeituancitiesSpider(scrapy.Spider):
                         if ele then
                             break
                         end
-                        splash:wait(0.05)
+                        splash:wait(0.5)
                     end
                 end
                 wait_for_element('article.poi-item')
@@ -112,7 +112,7 @@ class MeituancitiesSpider(scrapy.Spider):
                     if ele then
                         break
                     end
-                    splash:wait(0.05)
+                    splash:wait(0.5)
                 end
             end
             wait_for_element('.deal-item')
