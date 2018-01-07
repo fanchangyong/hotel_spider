@@ -18,11 +18,16 @@ class CtripSpider(scrapy.Spider):
             # Get max_page number
             script = """
             function wait_for_element(splash, ele_selector)
+                local count = 0
                 while true do
+                    if count > 20 then
+                        break
+                    end
                     local ele = splash:select(ele_selector)
                     if ele then
                         break
                     end
+                    count = count + 1
                     splash:wait(0.5)
                 end
             end
@@ -61,11 +66,16 @@ class CtripSpider(scrapy.Spider):
         for page in range(1, max_page + 1):
             script = """
             function wait_for_element(splash, ele_selector)
+                local count = 0
                 while true do
+                    if count > 20 then
+                        break
+                    end
                     local ele = splash:select(ele_selector)
                     if ele then
                         break
                     end
+                    count = count + 1
                     splash:wait(0.5)
                 end
             end
@@ -98,11 +108,16 @@ class CtripSpider(scrapy.Spider):
 
             script = """
             function wait_for_element(splash, ele_selector)
+                local count = 0
                 while true do
+                    if count > 20 then
+                        break
+                    end
                     local ele = splash:select(ele_selector)
                     if ele then
                         break
                     end
+                    count = count + 1
                     splash:wait(0.5)
                 end
             end

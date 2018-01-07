@@ -28,7 +28,11 @@ class MeituancitiesSpider(scrapy.Spider):
     def parse_before_max_page(self, response):
         script = """
         function wait_for_element(splash, ele_selector)
+            local count = 0
             while true do
+                if count > 20 then
+                    break
+                end
                 local ele = splash:select(ele_selector)
                 if ele then
                     break
@@ -75,11 +79,16 @@ class MeituancitiesSpider(scrapy.Spider):
                 assert(splash:go(url))
 
                 function wait_for_element(ele_selector)
+                    local count = 0
                     while true do
+                        if count > 20 then
+                            break
+                        end
                         local ele = splash:select(ele_selector)
                         if ele then
                             break
                         end
+                        count = count + 1
                         splash:wait(0.5)
                     end
                 end
@@ -107,11 +116,16 @@ class MeituancitiesSpider(scrapy.Spider):
             assert(splash:go(url))
 
             function wait_for_element(ele_selector)
+                local count = 0
                 while true do
+                    if count > 20 then
+                        break
+                    end
                     local ele = splash:select(ele_selector)
                     if ele then
                         break
                     end
+                    count = count + 1
                     splash:wait(0.5)
                 end
             end
