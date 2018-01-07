@@ -59,7 +59,7 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy_splash.SplashMiddleware': 725,
     'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
     'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': 811,
-    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
     # 'scrapy_proxies.RandomProxy': 100,
     # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
     # 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
