@@ -13,6 +13,8 @@ class CtripSpider(scrapy.Spider):
     def parse(self, response):
         for city in response.css('.pinyin_filter_detail dd a'):
             city_name = city.css('a::text').extract_first()
+            if city_name != '深圳':
+                continue
             city_url = city.css('a::attr(href)').extract_first()
 
             # Get max_page number

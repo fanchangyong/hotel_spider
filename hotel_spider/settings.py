@@ -60,10 +60,10 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
     'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': 811,
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-    # 'scrapy_proxies.RandomProxy': 100,
-    # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
-    # 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-    # 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
+    'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+    'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
 }
 
 # Enable or disable extensions
@@ -124,3 +124,6 @@ PROXY_MODE = 0
 
 # scrapy-fake-useragent
 RANDOM_UA_PER_PROXY = True
+
+# scrapy-rotating-proxies
+ROTATING_PROXY_LIST_PATH = 'proxy_list.txt'

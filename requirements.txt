@@ -1,5 +1,5 @@
-scrapy_splash
+-e git://github.com/fanchangyong/scrapy-splash#egg=scrapy-splash
 pymysql
 requests
-scrapy_proxies
+scrapy-rotating-proxies
 scrapy-fake-useragent
