@@ -25,6 +25,8 @@ class ExpediaSpider(scrapy.Spider):
             for j in range(len(cities)):
                 city = cities[j]
                 city_name = city['name']
+                if city_name != '深圳市':
+                    continue
                 districts = city['child']
                 for k in range(len(districts)):
                     district = districts[k]
@@ -56,11 +58,16 @@ class ExpediaSpider(scrapy.Spider):
         url = 'https://www.expedia.cn/Hotel-Search?destination=' + country_name + province_name + city_name + district_name
         script = """
         function wait_for_element(splash, ele_selector)
+            local i = 0
             while true do
+                if i > 20 then
+                    break
+                end
                 local ele = splash:select(ele_selector)
                 if ele then
                     break
                 end
+                i = i + 1
                 splash:wait(1)
             end
         end
@@ -95,11 +102,16 @@ class ExpediaSpider(scrapy.Spider):
         for page in range(1, pages + 1):
             script = """
             function wait_for_element(splash, ele_selector)
+                local i = 0
                 while true do
+                    if i > 20 then
+                        break
+                    end
                     local ele = splash:select(ele_selector)
                     if ele then
                         break
                     end
+                    i = i + 1
                     splash:wait(1)
                 end
             end
@@ -133,11 +145,16 @@ class ExpediaSpider(scrapy.Spider):
             hotel_url = hotel.css('a.flex-link::attr(href)').extract_first()
             script = """
             function wait_for_element(splash, ele_selector)
+                local i = 0
                 while true do
+                    if i > 20 then
+                        break
+                    end
                     local ele = splash:select(ele_selector)
                     if ele then
                         break
                     end
+                    i = i + 1
                     splash:wait(1)
                 end
             end
